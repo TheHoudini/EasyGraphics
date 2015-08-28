@@ -14,7 +14,9 @@ public:
 
     bool draw();
 
-    bool drawLine(QVector3D stPoint,QVector3D endPoint,const QColor &color);
+    void drawLine(QVector3D stPoint,QVector3D endPoint,const QColor &color);
+    void drawTriangle(QVector3D v0 , QVector3D v1 , QVector3D v2 , const QColor &color);
+
 
 signals:
 

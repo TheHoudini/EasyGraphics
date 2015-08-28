@@ -13,9 +13,28 @@ bool ImageDataPainter::draw()
     QVector<QVector3D> *data = m_model->vertexBuffer3D();
     QVector<QVector<int>> *faces = m_model->facesBuffer();
 
+
+    qDebug() << m_image->width() << " " << m_image->height();
     for(int i = 0; i < faces->count() ; i++)
     {
         const QVector<int> *face = &faces->at(i);
+
+        QVector3D triangleCoords[3];
+
+        for(int j = 0 ; j < 3 ; j++ )
+        {
+            QVector3D vec = data->at( face->at(j));
+            vec.setX( (vec.x() + 1.)*(m_image->width()-1.)/2. );
+            vec.setY( (vec.y() + 1.)*(m_image->height()-1.)/2.);
+            triangleCoords[j] = vec;
+        }
+
+        drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(qrand()%255, qrand()%255,qrand()%255 ));
+
+
+
+
+        /*
         for(int j = 0 ; j < 3 ; j++)
         {
             QVector3D start = data->at( face->at(j) );
@@ -25,11 +44,13 @@ bool ImageDataPainter::draw()
             end.setX( (end.x()+1.)*(m_image->width()-1)/2.  );
             end.setY( (end.y()+1.)*(m_image->height()-1)/2.  );
             drawLine( start , end , QColor(255,255,255)  );
-        }
+        }*/
+
+
+
+
 
     }
-
-
 
 
 
@@ -40,7 +61,7 @@ bool ImageDataPainter::draw()
 
 
 
-bool ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QColor &color)
+void ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QColor &color)
 {
 
     // if line is steep , transpose it
@@ -84,7 +105,43 @@ bool ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QCo
 
 
 
-    return true;
+}
+
+void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2, const QColor &color)
+{
+    if( v0.y() == v1.y()  && v0.y() == v2.y() ) return ; // ignore degenerate triangles
+
+    if(v0.y() > v1.y() ) std::swap(v0,v1);
+    if(v0.y() > v2.y() ) std::swap(v0,v2);
+    if(v1.y() > v2.y() ) std::swap(v1,v2);
+
+
+    int total_height = v2.y() - v0.y();
+    for(int i = 0 ; i<total_height;i++)
+    {
+        bool second_half = i > (v1.y() - v0.y()) || v1.y() == v0.y();
+        int  segment_height = second_half ? v2.y() - v1.y() : v1.y() - v0.y();
+
+        if(total_height == 0 || segment_height == 0 ) return;
+
+        float alpha = (float)i/total_height;
+        float beta  = (float)(i-(second_half ? v1.y()-v0.y() : 0))/segment_height;
+
+        QVector3D A = v0 + (v2 - v0)*alpha;
+        QVector3D B = (second_half ? (v1 + (v2-v1)*beta) : (v0 + (v1-v0)*beta)  )  ;
+
+        if(A.x() > B.x() ) std::swap(A,B);
+
+        for(int j = A.x() ; j< B.x() ; j++)
+        {
+            m_image->setPixel(j , v0.y() + i , color.rgb() );
+        }
+
+
+
+    }
+
+
 }
 
 
