@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector3D>
+#include <QVector2D>
 #include <QVector>
 
 
@@ -18,7 +19,7 @@ public:
     bool loadModel(const QString &filename);
 
     // data getters
-    QVector<QVector3D> *vertexBuffer();
+    QVector<QVector3D> *vertexBuffer3D();
     QVector<QVector<int>> *facesBuffer();
 
     // return last ModelManager error;

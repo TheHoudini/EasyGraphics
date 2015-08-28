@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QDebug>
 
+
 ModelManager::ModelManager(QObject *parent) : QObject(parent)
 {
 
@@ -29,9 +30,9 @@ bool ModelManager::loadModel(const QString &filename)
             // vertex struct : v x y z ,where x y z - float data of vertex
             QStringList vertexData = line.split(" ");
 
-            QVector3D vec( vertexData.at(1).toInt(),
-                           vertexData.at(2).toInt(),
-                           vertexData.at(3).toInt() );
+            QVector3D vec( vertexData.at(1).toDouble(),
+                           vertexData.at(2).toDouble(),
+                           vertexData.at(3).toDouble() );
             m_vertexBuffer.append(vec);
 
 
@@ -61,10 +62,11 @@ bool ModelManager::loadModel(const QString &filename)
 
 }
 
-QVector<QVector3D> *ModelManager::vertexBuffer()
+QVector<QVector3D> *ModelManager::vertexBuffer3D()
 {
     return &m_vertexBuffer;
 }
+
 
 QVector<QVector<int> > *ModelManager::facesBuffer()
 {

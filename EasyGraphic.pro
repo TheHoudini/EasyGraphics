@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    modelmanager.cpp
+    modelmanager.cpp \
+    painters/imagedatapainter.cpp
 
 HEADERS  += mainwindow.h \
-    modelmanager.h
+    modelmanager.h \
+    painters/imagedatapainter.h
 
 FORMS    += mainwindow.ui
 
