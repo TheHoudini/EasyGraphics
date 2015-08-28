@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>african_head.obj</file>
+    </qresource>
+</RCC>
