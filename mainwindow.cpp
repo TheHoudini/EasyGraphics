@@ -3,6 +3,7 @@
 #include "modelmanager.h"
 #include "painters/imagedatapainter.h"
 #include <QDebug>
+#include <QTransform>
 
 #include <QRgb>
 
@@ -22,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ImageDataPainter painter(m_image,&mgr,this);
     painter.draw();
 
-
-    ui->ImgLabel->setPixmap(QPixmap::fromImage(*m_image));
+    QTransform transform;
+    transform.rotate(180);
+    ui->ImgLabel->setPixmap(QPixmap::fromImage(m_image->transformed(transform)));
 }
 
 MainWindow::~MainWindow()

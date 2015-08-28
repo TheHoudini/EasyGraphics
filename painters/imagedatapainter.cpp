@@ -20,10 +20,10 @@ bool ImageDataPainter::draw()
         {
             QVector3D start = data->at( face->at(j) );
             QVector3D end = data->at( face->at((j+1)%3) );
-            start.setX( (start.x()+1.)*m_image->width()/2.  );
-            start.setY( (start.y()+1.)*m_image->height()/2.  );
-            end.setX( (end.x()+1.)*m_image->width()/2.  );
-            end.setY( (end.y()+1.)*m_image->height()/2.  );
+            start.setX( (start.x()+1.)*(m_image->width()-1)/2.  );
+            start.setY( (start.y()+1.)*(m_image->height()-1)/2.  );
+            end.setX( (end.x()+1.)*(m_image->width()-1)/2.  );
+            end.setY( (end.y()+1.)*(m_image->height()-1)/2.  );
             drawLine( start , end , QColor(255,255,255)  );
         }
 
@@ -74,7 +74,7 @@ bool ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QCo
 
         error2 += derror2;
         if (error2 > dx) {
-            y += (y1>y0?1:-1);
+            y += (endPoint.y()>stPoint.y()?1:-1);
             error2 -= dx*2;
         }
 

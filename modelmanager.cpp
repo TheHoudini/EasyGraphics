@@ -45,7 +45,7 @@ bool ModelManager::loadModel(const QString &filename)
             QVector<int> triangleData;
 
             for(int i=1;i<=3;i++)
-                triangleData.append( facesData.at(i).split("/").at(1).toInt() );
+                triangleData.append( facesData.at(i).split("/").at(0).toInt() - 1);
 
             m_facesBuffer.append(triangleData);
 
