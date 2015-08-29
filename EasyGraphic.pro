@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     modelmanager.cpp \
-    painters/imagedatapainter.cpp
+    painters/imagedatapainter.cpp \
+    tgaimage.cpp
 
 HEADERS  += mainwindow.h \
     modelmanager.h \
-    painters/imagedatapainter.h
+    painters/imagedatapainter.h \
+    tgaimage.h
 
 FORMS    += mainwindow.ui
 

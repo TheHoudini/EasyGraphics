@@ -5,6 +5,7 @@
 #include "modelmanager.h"
 #include <QImage>
 #include <QColor>
+#include "tgaimage.h"
 
 class ImageDataPainter : public QObject
 {
@@ -23,6 +24,7 @@ signals:
 public slots:
 
 private:
+    TGAImage *image;
     QImage *m_image;
     ModelManager *m_model;
 };

@@ -1,11 +1,21 @@
 #include "imagedatapainter.h"
 #include <QDebug>
+#include <tgaimage.h>
+
 void steepVector3D(QVector3D &vec);
+
+
+
+const TGAColor white = TGAColor(255, 255, 255, 255);
+const TGAColor red   = TGAColor(255, 0,   0,   255);
+const TGAColor green = TGAColor(0,   255, 0,   255);
 
 ImageDataPainter::ImageDataPainter(QImage *img,ModelManager *mgr,QObject *parent) : QObject(parent)
 {
     m_image = img;
     m_model = mgr;
+
+    image = new TGAImage(800,800,TGAImage::RGB);
 }
 
 bool ImageDataPainter::draw()
@@ -14,7 +24,7 @@ bool ImageDataPainter::draw()
     QVector<QVector<int>> *faces = m_model->facesBuffer();
 
 
-    qDebug() << m_image->width() << " " << m_image->height();
+
     QVector3D lightVec(0,0,-1);
     for(int i = 0; i < faces->count() ; i++)
     {
@@ -26,7 +36,11 @@ bool ImageDataPainter::draw()
         for(int j = 0 ; j < 3 ; j++ )
         {
             QVector3D vec = data->at( face->at(j));
-            triangleCoords[j] = QVector3D((vec.x() + 1.)*(m_image->width())/2. ,  (vec.y() + 1.)*(m_image->height())/2. , 0) ;
+            triangleCoords[j] = QVector3D( (vec.x() + 1.)*(m_image->width())/2. ,(vec.y() + 1.)*(m_image->height())/2. , 0) ;
+            triangleCoords[j].setX( (int)triangleCoords[j].x() );
+            triangleCoords[j].setY( (int)triangleCoords[j].y() );
+
+            //qDebug() <<triangleCoords[j];
             lightData[j] = vec;
         }
 
@@ -35,17 +49,25 @@ bool ImageDataPainter::draw()
         QVector3D n = QVector3D::normal(QVector3D(lightData[2] - lightData[0]) , QVector3D(lightData[1] - lightData[0])   );
 
 
-        float intensity = n.x() * lightVec.x() + n.y() * lightVec.y() + n.z() * lightVec.z();
+        float intensity = n.z() * lightVec.z();
 
 
 
         if(intensity > 0 )
-            drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(intensity*255, intensity*255,intensity*255,255 ));
+        {
+
+            drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(intensity*255, intensity*255,intensity*255 ));
+
+        }
+
 
 
 
     }
 
+    image->flip_vertically(); // i want to have the origin at the left bottom corner of the image
+    image->write_tga_file("output.tga");
+    delete image;
 
 
     return true;
@@ -105,8 +127,6 @@ void ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QCo
 void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2,  QColor &color)
 {
 
-    if(color.rgb() == Qt::black)
-        qDebug() << "HELLO";
 
     if( v0.y() == v1.y()  && v0.y() == v2.y() ) return ; // ignore degenerate triangles
 
@@ -121,7 +141,6 @@ void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2,  Q
         bool second_half = i > (v1.y() - v0.y()) || v1.y() == v0.y();
         int  segment_height = second_half ? v2.y() - v1.y() : v1.y() - v0.y();
 
-        if(total_height == 0 || segment_height == 0 ) return;
 
         float alpha = (float)i/total_height;
         float beta  = (float)(i-(second_half ? v1.y()-v0.y() : 0))/segment_height;
@@ -131,10 +150,10 @@ void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2,  Q
 
         if(A.x() > B.x() ) std::swap(A,B);
 
-        for(int j = A.x() ; j< B.x() ; j++)
+        for(int j = A.x() ; j<= B.x() ; j++)
         {
-
-            m_image->setPixel(j , v0.y() + i , color.rgb() );
+            image->set(j,v0.y() + i , TGAColor(color.red(),color.green(),color.blue() ) );
+            m_image->setPixel(j , v0.y() + i -1 , color.rgb() );
         }
 
 
