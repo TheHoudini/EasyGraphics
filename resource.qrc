@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>african_head.obj</file>
+        <file>african_head_diffuse.tga</file>
     </qresource>
 </RCC>

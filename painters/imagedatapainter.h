@@ -16,7 +16,7 @@ public:
     bool draw();
 
     void drawLine(QVector3D stPoint,QVector3D endPoint,const QColor &color);
-    void drawTriangle(QVector3D v0 , QVector3D v1 , QVector3D v2 , const QColor &color, int *zBuffer);
+    void drawTriangle(QVector3D v0 , QVector3D v1 , QVector3D v2 , QVector2D uv0, QVector2D uv1,QVector2D uv2, float intensity, int *zBuffer);
 
 
 signals:

@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_image = nullptr;
 
     ModelManager mgr;
-    if(!mgr.loadModel(":/african_head.obj"))
+    if(!mgr.loadModel(":/african_head.obj","e:/african_head_diffuse.tga"))
         qDebug() << "error on model load" << mgr.errorString();
     m_image = new QImage(width(),height(),QImage::Format_RGB32);
     m_image->fill(qRgba(0, 0, 0, 255));
