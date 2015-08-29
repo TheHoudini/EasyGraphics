@@ -22,7 +22,12 @@ bool ImageDataPainter::draw()
 {
     QVector<QVector3D> *data = m_model->vertexBuffer3D();
     QVector<QVector<int>> *faces = m_model->facesBuffer();
+    int zBufferSize = m_image->width()*m_image->height();
+    int *zBuffer = new int[zBufferSize];
 
+    for(int i = 0 ; i< zBufferSize ; i++ ){
+        zBuffer[i] = std::numeric_limits<int>::min();
+    }
 
 
     QVector3D lightVec(0,0,-1);
@@ -44,23 +49,13 @@ bool ImageDataPainter::draw()
             lightData[j] = vec;
         }
 
-
-
         QVector3D n = QVector3D::normal(QVector3D(lightData[2] - lightData[0]) , QVector3D(lightData[1] - lightData[0])   );
-
-
         float intensity = n.z() * lightVec.z();
-
-
 
         if(intensity > 0 )
         {
-
-            drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(intensity*255, intensity*255,intensity*255 ));
-
+            drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(intensity*255, intensity*255,intensity*255 ),zBuffer);
         }
-
-
 
 
     }
@@ -124,7 +119,7 @@ void ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QCo
 
 }
 
-void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2,  QColor &color)
+void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2, const  QColor &color, int *zBuffer)
 {
 
 
@@ -152,8 +147,18 @@ void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2,  Q
 
         for(int j = A.x() ; j<= B.x() ; j++)
         {
-            image->set(j,v0.y() + i , TGAColor(color.red(),color.green(),color.blue() ) );
-            m_image->setPixel(j , v0.y() + i -1 , color.rgb() );
+            float phi = B.x()==A.x() ? 1. : (float)(j-A.x())/(float)(B.x()-A.x());
+            QVector3D P = QVector3D(A) + QVector3D(B-A)*phi;
+            int idx = P.x()+P.y()*m_image->width();
+
+            if(zBuffer[idx] < P.z())
+            {
+                zBuffer[idx] = P.z();
+                m_image->setPixel(P.x(),P.y(),color.rgb());
+            }
+
+
+
         }
 
 
