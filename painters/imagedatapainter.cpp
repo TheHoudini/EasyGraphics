@@ -15,38 +15,32 @@ bool ImageDataPainter::draw()
 
 
     qDebug() << m_image->width() << " " << m_image->height();
+    QVector3D lightVec(0,0,-1);
     for(int i = 0; i < faces->count() ; i++)
     {
         const QVector<int> *face = &faces->at(i);
 
         QVector3D triangleCoords[3];
+        QVector3D lightData[3];
 
         for(int j = 0 ; j < 3 ; j++ )
         {
             QVector3D vec = data->at( face->at(j));
-            vec.setX( (vec.x() + 1.)*(m_image->width()-1.)/2. );
-            vec.setY( (vec.y() + 1.)*(m_image->height()-1.)/2.);
-            triangleCoords[j] = vec;
+            triangleCoords[j] = QVector3D((vec.x() + 1.)*(m_image->width())/2. ,  (vec.y() + 1.)*(m_image->height())/2. , 0) ;
+            lightData[j] = vec;
         }
 
-        drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(qrand()%255, qrand()%255,qrand()%255 ));
+
+
+        QVector3D n = QVector3D::normal(QVector3D(lightData[2] - lightData[0]) , QVector3D(lightData[1] - lightData[0])   );
+
+
+        float intensity = n.x() * lightVec.x() + n.y() * lightVec.y() + n.z() * lightVec.z();
 
 
 
-
-        /*
-        for(int j = 0 ; j < 3 ; j++)
-        {
-            QVector3D start = data->at( face->at(j) );
-            QVector3D end = data->at( face->at((j+1)%3) );
-            start.setX( (start.x()+1.)*(m_image->width()-1)/2.  );
-            start.setY( (start.y()+1.)*(m_image->height()-1)/2.  );
-            end.setX( (end.x()+1.)*(m_image->width()-1)/2.  );
-            end.setY( (end.y()+1.)*(m_image->height()-1)/2.  );
-            drawLine( start , end , QColor(255,255,255)  );
-        }*/
-
-
+        if(intensity > 0 )
+            drawTriangle(triangleCoords[0],triangleCoords[1],triangleCoords[2],QColor(intensity*255, intensity*255,intensity*255,255 ));
 
 
 
@@ -88,10 +82,11 @@ void ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QCo
     for(int x = stPoint.x(); x<endPoint.x();x++)
     {
 
+
         if(steep)
-            m_image->setPixel(y,x,color.rgba()); // if transposed,de-transpose
+            m_image->setPixel(y,x,color.rgb()); // if transposed,de-transpose
         else
-            m_image->setPixel(x,y,color.rgba());
+            m_image->setPixel(x,y,color.rgb());
 
         error2 += derror2;
         if (error2 > dx) {
@@ -107,8 +102,12 @@ void ImageDataPainter::drawLine(QVector3D stPoint, QVector3D endPoint, const QCo
 
 }
 
-void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2, const QColor &color)
+void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2,  QColor &color)
 {
+
+    if(color.rgb() == Qt::black)
+        qDebug() << "HELLO";
+
     if( v0.y() == v1.y()  && v0.y() == v2.y() ) return ; // ignore degenerate triangles
 
     if(v0.y() > v1.y() ) std::swap(v0,v1);
@@ -134,6 +133,7 @@ void ImageDataPainter::drawTriangle(QVector3D v0, QVector3D v1, QVector3D v2, co
 
         for(int j = A.x() ; j< B.x() ; j++)
         {
+
             m_image->setPixel(j , v0.y() + i , color.rgb() );
         }
 

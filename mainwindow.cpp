@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QTransform>
 
+
+#include <QMouseEvent>
 #include <QRgb>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -31,4 +33,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << event->x() << event->y();
 }
